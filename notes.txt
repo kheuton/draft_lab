@@ -1,0 +1,3 @@
+- Clean data
+- Evaluate expected value
+- Calcualte value of each pick
