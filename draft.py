@@ -1,24 +1,24 @@
-import csv
-import numpy
-# You may or may not want to use this package, or others like it
-# this is just a starting point for you
-from sklearn.linear_model import LinearRegression
+import pandas as pd
 
-# Read the player database into an array of dictionaries
-players = []
-with open('playerDB.csv', mode='r') as player_csv:
-    player_reader = csv.DictReader(player_csv)
-    line_count = 0
-    for row in player_reader:
-        players.append(dict(row))
+# Load precomputed average rookie winshares
+avg_rookie_ws = pd.read_csv('avg_rookie_winshare.csv', index_col=0).WS
+# Sort for trade value
+trade_val = pd.Series(index=avg_rookie_ws.index, data=avg_rookie_ws.sort_values(ascending=False).values)
 
-# Read the draft database into an array of dictionaries
-draftPicks = []
-with open('draftDB.csv', mode='r') as draft_csv:
-    draft_reader = csv.DictReader(draft_csv)
-    line_count = 0
-    for row in draft_reader:
-        draftPicks.append(dict(row))
+def trade_eval(give_picks, receive_picks):
+    give_val = trade_val.loc[give_picks].sum()
+    receive_val = trade_val.loc[receive_picks].sum()
+
+    success = receive_val > give_val
+    if success:
+        print("\nTrade result: Success! This trade receives more value than it gives away.\n")
+        # Print additional metrics/reasoning here
+    else:
+        print("\nTrade result: Don't do it! This trade gives away more value than it receives.\n")
+        # Print additional metrics/reasoning here
+
+    print(f'Give val: {give_val}')
+    print(f'Receive val: {receive_val}')
 
 
 # Get the draft picks to give/receive from the user
@@ -34,20 +34,5 @@ receive_str = input("Picks to receive: ")
 give_picks = list(map(int, give_str.split(',')))
 receive_picks = list(map(int, receive_str.split(',')))
 
-# Success indicator that you will need to update based on your trade analysis
-success = True
+trade_eval(give_picks, receive_picks)
 
-
-
-# YOUR SOLUTION GOES HERE
-
-
-
-# Print feeback on trade
-# DO NOT CHANGE THESE OUTPUT MESSAGES
-if success:
-    print("\nTrade result: Success! This trade receives more value than it gives away.\n")
-    # Print additional metrics/reasoning here
-else:
-    print("\nTrade result: Don't do it! This trade gives away more value than it receives.\n")
-    # Print additional metrics/reasoning here
